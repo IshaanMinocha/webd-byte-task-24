@@ -1,0 +1,14 @@
+{
+  "name": "byte-webdev-task",
+  "version": "1.0.0",
+  "description": "byte webdev recruitment task demo",
+  "main": "index.js",
+  "scripts": {
+    "start": "cd server && npm run start",
+    "build": "cd server && npm i && cd ../client && npm i && npm run build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {}
+}
