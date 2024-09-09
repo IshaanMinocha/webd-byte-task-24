@@ -10,7 +10,7 @@ const Home = () => {
         <Link to="/public">
           <DottedButton>/public</DottedButton>
         </Link>
-        <Link to="/private">
+        <Link to="/authorizefirst">
           <DottedButton>/private</DottedButton>
         </Link>
       </div>
