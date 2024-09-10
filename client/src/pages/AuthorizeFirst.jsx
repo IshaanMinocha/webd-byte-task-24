@@ -19,7 +19,8 @@ const AuthorizeFirst = ({ setIsVerified }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  // const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const backendUrl = "https://webd-byte-task-24.onrender.com"
 
   const fetchGitHubProfile = async (ghToken) => {
     try {
