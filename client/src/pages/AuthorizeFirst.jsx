@@ -19,7 +19,7 @@ const AuthorizeFirst = ({ setIsVerified }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
   const fetchGitHubProfile = async (ghToken) => {
     try {
@@ -56,39 +56,36 @@ const AuthorizeFirst = ({ setIsVerified }) => {
     const ghToken = queryParams.get('ghtoken');
     const ytToken = queryParams.get('yttoken');
 
-    if (ghToken) {
-      localStorage.setItem('ghToken', ghToken);
-      fetchGitHubProfile(ghToken);
+    if (ghToken || ytToken) {
+      if (ghToken) {
+        localStorage.setItem('ghToken', ghToken);
+        fetchGitHubProfile(ghToken);
+      }
+      if (ytToken) {
+        localStorage.setItem('ytToken', ytToken);
+        fetchGoogleProfile(ytToken);
+      }
+      navigate('/authorizefirst');
     } else {
       const storedGhToken = localStorage.getItem('ghToken');
-      if (storedGhToken) {
-        fetchGitHubProfile(storedGhToken);
-      }
-    }
-    if (ytToken) {
-      localStorage.setItem('ytToken', ytToken);
-      fetchGoogleProfile(ytToken);
-    } else {
       const storedYtToken = localStorage.getItem('ytToken');
-      if (storedYtToken) {
-        fetchGoogleProfile(storedYtToken);
-      }
+      if (storedGhToken) fetchGitHubProfile(storedGhToken);
+      if (storedYtToken) fetchGoogleProfile(storedYtToken);
     }
-    navigate('/authorizefirst')
-  }, [location]);
+  }, [location.search]);
 
   const handleGoogleLogin = async () => {
-    window.open(`/auth/google`, "_self")
+    window.open(`${backendUrl}/auth/google`, "_self")
   };
 
   const handleGitHubLogin = async () => {
-    window.open(`/auth/github`, "_self")
+    window.open(`${backendUrl}/auth/github`, "_self")
   };
 
   const handleVerifySubscription = async () => {
     setLoadingSubscription(true);
     try {
-      const response = await axios.post(`/api/verify-subscription`, {
+      const response = await axios.post(`${backendUrl}/api/verify-subscription`, {
         token: localStorage.getItem('ytToken')
       });
       if (response.data.verified) {
@@ -104,7 +101,7 @@ const AuthorizeFirst = ({ setIsVerified }) => {
   const handleVerifyFollowing = async () => {
     setLoadingFollowing(true);
     try {
-      const response = await axios.post(`/api/verify-following`, {
+      const response = await axios.post(`${backendUrl}/api/verify-following`, {
         token: localStorage.getItem('ghToken')
       });
       if (response.data.verified) {

@@ -34,6 +34,13 @@ const staticDir = path.join(__dirname, '..', 'client', 'dist')
 //     maxAge: 24*60*60*100,
 // }));
 
+// server.use((req, res, next) => {
+//     if (req.secure) {
+//         return next();
+//     }
+//     res.redirect(`https://${req.headers.host}${req.url}`);
+// });
+
 server.use(session({
     secret: process.env.SESSION_SECRET,
     store: store,
@@ -46,18 +53,12 @@ server.use(session({
     saveUninitialized: true
 }));
 
-server.use((req, res, next) => {
-    if (req.secure) {
-        return next();
-    }
-    res.redirect(`https://${req.headers.host}${req.url}`);
-});
-
 server.use(cors({
     origin: process.env.CORS_ORIGIN,
     methods: "GET,POST,PUT,DELETE,PATCH",
     credentials: true
 }));
+
 server.use(express.json())
 server.use(express.static(staticDir))
 server.use((err, req, res, next) => {
