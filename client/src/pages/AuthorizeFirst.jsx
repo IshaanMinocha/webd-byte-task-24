@@ -20,7 +20,6 @@ const AuthorizeFirst = ({ setIsVerified }) => {
   const location = useLocation();
 
   // const backendUrl = import.meta.env.VITE_BACKEND_URL;
-  const backendUrl = "https://webd-byte-task-24.onrender.com"
 
   const fetchGitHubProfile = async (ghToken) => {
     try {
@@ -66,7 +65,7 @@ const AuthorizeFirst = ({ setIsVerified }) => {
         localStorage.setItem('ytToken', ytToken);
         fetchGoogleProfile(ytToken);
       }
-      navigate('/authorizefirst');
+      navigate('/authorizefirst'); 
     } else {
       const storedGhToken = localStorage.getItem('ghToken');
       const storedYtToken = localStorage.getItem('ytToken');
@@ -76,17 +75,17 @@ const AuthorizeFirst = ({ setIsVerified }) => {
   }, [location.search]);
 
   const handleGoogleLogin = async () => {
-    window.open(`${backendUrl}/auth/google`, "_self")
+    window.open(`/auth/google`, "_self")
   };
 
   const handleGitHubLogin = async () => {
-    window.open(`${backendUrl}/auth/github`, "_self")
+    window.open(`/auth/github`, "_self")
   };
 
   const handleVerifySubscription = async () => {
     setLoadingSubscription(true);
     try {
-      const response = await axios.post(`${backendUrl}/api/verify-subscription`, {
+      const response = await axios.post(`/api/verify-subscription`, {
         token: localStorage.getItem('ytToken')
       });
       if (response.data.verified) {
@@ -102,7 +101,7 @@ const AuthorizeFirst = ({ setIsVerified }) => {
   const handleVerifyFollowing = async () => {
     setLoadingFollowing(true);
     try {
-      const response = await axios.post(`${backendUrl}/api/verify-following`, {
+      const response = await axios.post(`/api/verify-following`, {
         token: localStorage.getItem('ghToken')
       });
       if (response.data.verified) {

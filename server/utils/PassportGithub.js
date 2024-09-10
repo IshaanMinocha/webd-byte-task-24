@@ -7,7 +7,7 @@ envConfig();
 passport.use(new GitHubStrategy({
   clientID: process.env.GITHUB_CLIENT_ID,
   clientSecret: process.env.GITHUB_CLIENT_SECRET,
-  callbackURL: '/auth/github/callback',
+  callbackURL: `${backendUrl}/auth/github/callback`,
 }, (accessToken, refreshToken, profile, done) => {
   profile.token = accessToken;
   return done(null, profile);
