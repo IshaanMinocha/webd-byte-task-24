@@ -12,7 +12,7 @@ router.get('/github/callback', passport.authenticate('github', {
   res.redirect(`http://localhost:5173/authorizefirst?ghtoken=${ghToken}`);
 });
 
-router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email', 'https://www.googleapis.com/auth/youtube.readonly'] }));
 
 router.get('/google/callback', passport.authenticate('google', {
   failureRedirect: 'http://localhost:5173/unauthorized',

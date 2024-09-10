@@ -14,6 +14,7 @@ const AuthorizeFirst = ({ setIsVerified }) => {
   const [googleProfilePic, setGoogleProfilePic] = useState('');
   const [googleName, setGoogleName] = useState('');
   const [loadingFollowing, setLoadingFollowing] = useState(false);
+  const [loadingSubscription, setLoadingSubscription] = useState(false);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
@@ -27,6 +28,7 @@ const AuthorizeFirst = ({ setIsVerified }) => {
           Authorization: `Bearer ${ghToken}`,
         },
       });
+      // console.log("github: " + response.data)
       const { avatar_url, login } = response.data;
       setGitHubProfilePic(avatar_url);
       setGitHubName(login);
@@ -39,6 +41,7 @@ const AuthorizeFirst = ({ setIsVerified }) => {
   const fetchGoogleProfile = async (ytToken) => {
     try {
       const response = await axios.get(`https://www.googleapis.com/oauth2/v3/userinfo?access_token=${ytToken}`);
+      // console.log("google: " + response.data)
       const { picture, name } = response.data;
       setGoogleProfilePic(picture);
       setGoogleName(name);
@@ -82,13 +85,37 @@ const AuthorizeFirst = ({ setIsVerified }) => {
     window.open(`${backendUrl}/auth/github`, "_self")
   };
 
-  const handleVerifySubscription = () => {
-    setIsSubscribed(true);
+  const handleVerifySubscription = async () => {
+    setLoadingSubscription(true);
+    try {
+      const response = await axios.post(`${backendUrl}/api/verify-subscription`, {
+        token: localStorage.getItem('ytToken')
+      });
+      if (response.data.verified) {
+        setIsSubscribed(true);
+      }
+    } catch (err) {
+      setError('Error verifying subscription.');
+    } finally {
+      setLoadingSubscription(false);
+    }
   };
 
   const handleVerifyFollowing = async () => {
-    setIsFollowing(true);
-  }
+    setLoadingFollowing(true);
+    try {
+      const response = await axios.post(`${backendUrl}/api/verify-following`, {
+        token: localStorage.getItem('ghToken')
+      });
+      if (response.data.verified) {
+        setIsFollowing(true);
+      }
+    } catch (err) {
+      setError('Error verifying following.');
+    } finally {
+      setLoadingFollowing(false);
+    }
+  };
 
   const handleGoToPrivate = () => {
     if (isSubscribed && isFollowing) {
@@ -136,18 +163,18 @@ const AuthorizeFirst = ({ setIsVerified }) => {
       <p className='text-dark text-xl mb-2'>verify now: </p>
       <div className="flex flex-col-2 gap-4 mb-20">
         <button
-          className={`p-3 bg-dark text-light rounded ${isSubscribed ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className={`p-3 bg-dark text-light rounded ${!isLoggedInGoogle ? 'opacity-50 cursor-not-allowed' : ''}`}
           onClick={handleVerifySubscription}
-          disabled={isSubscribed}
+          disabled={!isLoggedInGoogle}
         >
-          {isSubscribed ? "yt subscription verified" : "verify yt subscription"}
+          {loadingSubscription ? "checking..." : isSubscribed ? "verified!" : "verify yt subscription"}
         </button>
         <button
-          className={`p-3 bg-dark text-light rounded ${!isLoggedInGitHub || isFollowing ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className={`p-3 bg-dark text-light rounded ${!isLoggedInGitHub ? 'opacity-50 cursor-not-allowed' : ''}`}
           onClick={handleVerifyFollowing}
-          disabled={!isLoggedInGitHub || isFollowing}
+          disabled={!isLoggedInGitHub}
         >
-          {loadingFollowing ? "checking..." : isFollowing ? "gh following verified" : "verify gh following"}
+          {loadingFollowing ? "checking..." : isFollowing ? "verified!" : "verify gh following"}
         </button>
       </div>
       {error && <div className="text-red-500">{error}</div>}
