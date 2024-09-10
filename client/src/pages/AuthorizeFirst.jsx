@@ -19,7 +19,7 @@ const AuthorizeFirst = ({ setIsVerified }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  // const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
   const fetchGitHubProfile = async (ghToken) => {
     try {
@@ -78,24 +78,24 @@ const AuthorizeFirst = ({ setIsVerified }) => {
   }, [location]);
 
   const handleGoogleLogin = async () => {
-    window.open(`${backendUrl}/auth/google`, "_self")
+    window.open(`/auth/google`, "_self")
   };
 
   const handleGitHubLogin = async () => {
-    window.open(`${backendUrl}/auth/github`, "_self")
+    window.open(`/auth/github`, "_self")
   };
 
   const handleVerifySubscription = async () => {
     setLoadingSubscription(true);
     try {
-      const response = await axios.post(`${backendUrl}/api/verify-subscription`, {
+      const response = await axios.post(`/api/verify-subscription`, {
         token: localStorage.getItem('ytToken')
       });
       if (response.data.verified) {
         setIsSubscribed(true);
       }
     } catch (err) {
-      setError('Error verifying subscription.');
+      setError('byte youtube not subscribed!');
     } finally {
       setLoadingSubscription(false);
     }
@@ -104,14 +104,14 @@ const AuthorizeFirst = ({ setIsVerified }) => {
   const handleVerifyFollowing = async () => {
     setLoadingFollowing(true);
     try {
-      const response = await axios.post(`${backendUrl}/api/verify-following`, {
+      const response = await axios.post(`/api/verify-following`, {
         token: localStorage.getItem('ghToken')
       });
       if (response.data.verified) {
         setIsFollowing(true);
       }
     } catch (err) {
-      setError('Error verifying following.');
+      setError('byte github not followed!');
     } finally {
       setLoadingFollowing(false);
     }
@@ -160,24 +160,28 @@ const AuthorizeFirst = ({ setIsVerified }) => {
           )}
         </div>
       </div>
-      <p className='text-dark text-xl mb-2'>verify now: </p>
+      {isFollowing && isSubscribed ?
+        <p className='text-dark text-xl mb-2'>both verified! </p>
+        :
+        <p className='text-dark text-xl mb-2'>verify now: </p>
+      }
       <div className="flex flex-col-2 gap-4 mb-20">
         <button
           className={`p-3 bg-dark text-light rounded ${!isLoggedInGoogle ? 'opacity-50 cursor-not-allowed' : ''}`}
           onClick={handleVerifySubscription}
           disabled={!isLoggedInGoogle}
         >
-          {loadingSubscription ? "checking..." : isSubscribed ? "verified!" : "verify yt subscription"}
+          {loadingSubscription ? "checking..." : isSubscribed ? "verified yt!" : "verify yt subscription"}
         </button>
         <button
           className={`p-3 bg-dark text-light rounded ${!isLoggedInGitHub ? 'opacity-50 cursor-not-allowed' : ''}`}
           onClick={handleVerifyFollowing}
           disabled={!isLoggedInGitHub}
         >
-          {loadingFollowing ? "checking..." : isFollowing ? "verified!" : "verify gh following"}
+          {loadingFollowing ? "checking..." : isFollowing ? "verified gh!" : "verify gh following"}
         </button>
       </div>
-      {error && <div className="text-red-500">{error}</div>}
+      {error && <div className="bg-dark/40 text-light text-lg font-thin mb-5 p-3 rounded-2xl">{error}</div>}
       <DottedButton
         className="p-3 bg-gray-500 text-white rounded"
         disabled={!(isSubscribed && isFollowing)}

@@ -37,12 +37,12 @@ server.use(session({
     }
 }));
 server.use(cors({
-    origin: "http://localhost:5173",
+    origin: process.env.CORS_ORIGIN,
     methods: "GET,POST,PUT,DELETE,PATCH",
     credentials: true
 }));
 server.use(express.json())
-// server.use(express.static(staticDir))
+server.use(express.static(staticDir))
 server.use((err, req, res, next) => {
     console.error(err);
     res.status(500).send("Internal Server Error");
@@ -54,9 +54,9 @@ server.use(passport.session());
 server.use('/auth', authRoutes);
 server.use('/api', apiRoutes);
 
-// server.get('*', (req, res, next) => {
-//     return res.sendFile(path.join(staticDir, 'index.html'))
-// });
+server.get('*', (req, res, next) => {
+    return res.sendFile(path.join(staticDir, 'index.html'))
+});
 
 server.listen(port, () =>
     console.log(`Server running on port:${port}`)
