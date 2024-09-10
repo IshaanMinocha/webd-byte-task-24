@@ -106,9 +106,11 @@ const AuthorizeFirst = ({ setIsVerified }) => {
       if (response.data.verified) {
         setIsSubscribed(true);
         setError(null);
+      } else {
+        setError('byte youtube not subscribed!');
       }
     } catch (err) {
-      setError('byte youtube not subscribed!');
+      setError('server error');
     } finally {
       setLoadingSubscription(false);
     }
