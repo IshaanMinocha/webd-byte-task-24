@@ -65,7 +65,7 @@ const AuthorizeFirst = ({ setIsVerified }) => {
         localStorage.setItem('ytToken', ytToken);
         fetchGoogleProfile(ytToken);
       }
-      navigate('/authorizefirst'); 
+      navigate('/authorizefirst');
     } else {
       const storedGhToken = localStorage.getItem('ghToken');
       const storedYtToken = localStorage.getItem('ytToken');
@@ -82,6 +82,21 @@ const AuthorizeFirst = ({ setIsVerified }) => {
     window.open(`/auth/github`, "_self")
   };
 
+  const handleLogout = (platform) => {
+    if (platform === 'google') {
+      localStorage.removeItem('ytToken');
+      setGoogleProfilePic('');
+      setGoogleName('');
+      setIsLoggedInGoogle(false);
+    } else if (platform === 'github') {
+      localStorage.removeItem('ghToken');
+      setGitHubProfilePic('');
+      setGitHubName('');
+      setIsLoggedInGitHub(false);
+    }
+    navigate('/authorizefirst');
+  };
+
   const handleVerifySubscription = async () => {
     setLoadingSubscription(true);
     try {
@@ -90,6 +105,7 @@ const AuthorizeFirst = ({ setIsVerified }) => {
       });
       if (response.data.verified) {
         setIsSubscribed(true);
+        setError(null);
       }
     } catch (err) {
       setError('byte youtube not subscribed!');
@@ -106,6 +122,7 @@ const AuthorizeFirst = ({ setIsVerified }) => {
       });
       if (response.data.verified) {
         setIsFollowing(true);
+        setError(null);
       }
     } catch (err) {
       setError('byte github not followed!');
@@ -131,6 +148,12 @@ const AuthorizeFirst = ({ setIsVerified }) => {
             <div className="flex flex-col items-center">
               <img src={googleProfilePic} alt="Google Profile" className="w-16 h-16 rounded-full" />
               <p className="text-dark mt-2">{googleName}</p>
+              <button
+                onClick={() => handleLogout('google')}
+                className="mt-2 p-2 bg-dark text-light rounded"
+              >
+                Logout
+              </button>
             </div>
           ) : (
             <button
@@ -146,6 +169,12 @@ const AuthorizeFirst = ({ setIsVerified }) => {
             <div className="flex flex-col items-center">
               <img src={githubProfilePic} alt="GitHub Profile" className="w-16 h-16 rounded-full" />
               <p className="text-dark mt-2">{githubName}</p>
+              <button
+                onClick={() => handleLogout('github')}
+                className="mt-2 p-2 bg-dark text-light rounded"
+              >
+                Logout
+              </button>
             </div>
           ) : (
             <button
