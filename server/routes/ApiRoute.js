@@ -42,20 +42,26 @@ router.post('/verify-subscription', async (req, res) => {
   }
 
   try {
-    const response = await axios.get(
-      `https://www.googleapis.com/youtube/v3/subscriptions?part=snippet&mine=true&maxResults=500000`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    let isSubscribed = false;
+    let nextPageToken = '';
 
-    const subscriptions = response.data.items;
-    // console.log(subscriptions)
-    const isSubscribed = subscriptions.some(
-      (subscription) => subscription.snippet.resourceId.channelId === YOUTUBE_CHANNEL_ID
-    );
+    do {
+      const response = await axios.get(
+        `https://www.googleapis.com/youtube/v3/subscriptions?part=snippet&mine=true&maxResults=50&pageToken=${nextPageToken}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const subscriptions = response.data.items;
+      isSubscribed = subscriptions.some(
+        (subscription) => subscription.snippet.resourceId.channelId === YOUTUBE_CHANNEL_ID
+      );
+
+      nextPageToken = response.data.nextPageToken;
+    } while (nextPageToken && !isSubscribed);
 
     return res.json({ verified: isSubscribed });
   } catch (error) {
