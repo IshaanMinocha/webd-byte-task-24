@@ -3,13 +3,20 @@ import envConfig from './config/dotenv.js';
 import cors from 'cors';
 import { fileURLToPath } from 'url';
 import path, { dirname } from 'path';
-import cookieSession from 'cookie-session';
+// import cookieSession from 'cookie-session';
 import session from 'express-session';
 import authRoutes from './routes/AuthRoute.js'
 import apiRoutes from './routes/ApiRoute.js'
 import passport from 'passport';
 import './utils/PassportGoogle.js'
 import './utils/PassportGithub.js'
+import Memorystore from 'memorystore';
+
+const MemoryStore = Memorystore(session);
+
+const store = new MemoryStore({
+    checkPeriod: 24 * 60 * 60 * 1000
+});
 
 envConfig();
 
@@ -26,16 +33,26 @@ const staticDir = path.join(__dirname, '..', 'client', 'dist')
 //     keys: [process.env.SESSION_SECRET],
 //     maxAge: 24*60*60*100,
 // }));
+
 server.use(session({
     secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: true,
+    store: store,
     cookie: {
         maxAge: 24 * 60 * 60 * 1000,
         sameSite: 'lax',
         secure: false
-    }
+    },
+    resave: false,
+    saveUninitialized: true
 }));
+
+server.use((req, res, next) => {
+    if (req.secure) {
+        return next();
+    }
+    res.redirect(`https://${req.headers.host}${req.url}`);
+});
+
 server.use(cors({
     origin: process.env.CORS_ORIGIN,
     methods: "GET,POST,PUT,DELETE,PATCH",
