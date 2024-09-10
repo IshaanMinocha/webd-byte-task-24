@@ -4,6 +4,8 @@ import envConfig from '../config/dotenv.js';
 
 envConfig();
 
+const backendUrl = process.env.CORS_ORIGIN;
+
 passport.use(new GitHubStrategy({
   clientID: process.env.GITHUB_CLIENT_ID,
   clientSecret: process.env.GITHUB_CLIENT_SECRET,
